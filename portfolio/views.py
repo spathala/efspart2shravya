@@ -5,6 +5,10 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from .forms import *
 from django.db.models import Sum
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import CustomerSerializer
 
 
 
@@ -116,12 +120,11 @@ def investment_new(request):
        # print("Else")
    return render(request, 'portfolio/investment_new.html', {'form': form})
 
-
 @login_required
 def investment_edit(request, pk):
    investment = get_object_or_404(Investment, pk=pk)
    if request.method == "POST":
-       form = InvestmentForm(request.POST, instance= investment)
+       form = InvestmentForm(request.POST, instance=investment)
        if form.is_valid():
            investment = form.save()
            # investment.customer = investment.id
@@ -134,14 +137,12 @@ def investment_edit(request, pk):
        form = InvestmentForm(instance=investment)
    return render(request, 'portfolio/investment_edit.html', {'form': form})
 
-
 @login_required
 def investment_delete(request, pk):
-   investment = get_object_or_404(Investment, pk=pk)
+   investment = get_object_or_404(Stock, pk=pk)
    investment.delete()
    investments = Investment.objects.filter(acquired_date__lte=timezone.now())
    return render(request, 'portfolio/investment_list.html', {'investments': investments})
-
 
 @login_required
 def portfolio(request,pk):
@@ -149,13 +150,21 @@ def portfolio(request,pk):
    customers = Customer.objects.filter(created_date__lte=timezone.now())
    investments =Investment.objects.filter(customer=pk)
    stocks = Stock.objects.filter(customer=pk)
+   sum_recent_value = Investment.objects.filter(customer=pk).aggregate(Sum('recent_value'))
    sum_acquired_value = Investment.objects.filter(customer=pk).aggregate(Sum('acquired_value'))
 
 
    return render(request, 'portfolio/portfolio.html', {'customers': customers, 'investments': investments,
                                                       'stocks': stocks,
+                                                      'sum_recent_value': sum_recent_value,
                                                       'sum_acquired_value': sum_acquired_value,})
 
 
+# List at the end of the views.py
+# Lists all customers
+class CustomerList(APIView):
 
-
+    def get(self,request):
+        customers_json = Customer.objects.all()
+        serializer = CustomerSerializer(customers_json, many=True)
+        return Response(serializer.data)

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 import dj_database_url
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -78,7 +79,6 @@ WSGI_APPLICATION = 'efsblogss.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-    'default': {
         'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'd2fsiv5o52lar0',
@@ -86,8 +86,6 @@ DATABASES = {
         'PASSWORD': '532c6573e5fdbb5b77a5879655efec335b47bb591b4f5323d8fec2b24e7eba73',
         'HOST': 'ec2-107-22-162-158.compute-1.amazonaws.com',
         'PORT': '5432',
-    }
-
     }
 }
 
